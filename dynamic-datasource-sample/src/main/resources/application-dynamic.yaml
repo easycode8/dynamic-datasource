@@ -1,0 +1,77 @@
+# 动态数据源配置(引入starter增加类似示例配置)
+spring:
+  #开发时关闭缓存,不然没法看到实时页面
+  thymeleaf:
+    cache: false
+  datasource:
+    dynamic:
+      enabled: true #是否开启动态数据源,默认true
+      transaction:
+        enabled: false #是否开启动态数据源事务,默认为true
+      header: db-type #是否开启请求头切换,默认为空则不开启,优先级低于注解配置
+      primary: master #首选数据源, 未指定数据源情况下使用的数据源,一般设置未主数据源, 默认master
+      check: true
+      datasource:
+        master:
+          driver-class-name: org.h2.Driver
+          #jdbc-url: jdbc:h2:mem:test #内存模式(多数据源需要使用jdbc-url替代url才能注入DataSource属性中)
+          jdbc-url: jdbc:h2:file:.\target\temp\h2\db01  # 文件模式
+          username: root
+          password: EJAisMC4a7NxS/eEpNoe7skuuR8c17iA42tsL3hDi8Stkos3JE4KXdveZjQhPyJuBknqM8rO96EHebPno8yGfA==
+          type: com.alibaba.druid.pool.DruidDataSource
+        db1:
+          driver-class-name: org.h2.Driver
+          #jdbc-url: jdbc:h2:mem:test #内存模式(多数据源需要使用jdbc-url替代url才能注入DataSource属性中)
+          jdbc-url: jdbc:h2:file:.\target\temp\h2\db02  # 文件模式
+          username: root
+          password: 123456
+        db2:
+          driver-class-name: com.mysql.jdbc.Driver
+          jdbc-url: jdbc:mysql://192.168.4.187:3306/test?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true
+          username: root
+          password: 123456
+
+
+
+#    druid:
+#      filter:
+#        # sql防火墙
+#        wall:
+#          enabled: false
+#        config:
+#          enabled: true #是否开启druid密码加密
+#      connect-properties:
+#        config.decrypt: true
+#        # public-key
+#        config.decrypt.key: ${global.database.zoemdb.decryptKey:MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBANe5vKzsVQKIejvD4PDV4yHp0ddDGwQwFWa63APDo/lws549fjHG059mTmSO3OMj7IjgWdvVOAIuU899rciLpB8CAwEAAQ==}
+#      # 最大连接池数量
+#      max-active: ${global.database.pool.default.max-active:50}
+#      # 从连接池获取连接等待超时的时间
+#      max-wait: ${global.database.pool.default.max-wait:5000}
+#      # 最小连接池数量
+#      min-idle: ${global.database.pool.default.min-idel:1}
+#      # 配置一个连接在池中最大空闲时间，单位是毫秒
+#      min-evictable-idle-time-millis: ${global.database.pool.default.min-evictable-idle-time-millis:300000}
+#      # 连接泄露检查，打开removeAbandoned功能 , 连接从连接池借出后，长时间不归还，将触发强制回连接。回收周期随timeBetweenEvictionRunsMillis进行，
+#      # 如果连接为从连接池借出状态，并且未执行任何sql，并且从借出时间起已超过removeAbandonedTimeout时间，则强制归还连接到连接池中。
+#      remove-abandoned: ${global.database.pool.default.remove-abandoned:false}
+#      # 回收超时时间
+#      remove-abandoned-timeout-millis: ${global.database.pool.default.remove-abandoned-timeout-millis:80000}
+#      # 打开后，增强timeBetweenEvictionRunsMillis的周期性连接检查，
+#      # minIdle内的空闲连接，每次检查强制验证连接有效性. 参考：https://github.com/alibaba/druid/wiki/KeepAlive_cn
+#      keep-alive: ${global.database.pool.default.keep-alive:true}
+#      # 打开PSCache
+#      pool-prepared-statements: ${global.database.pool.default.pool-prepared-statements:true}
+#      # 指定每个连接上PSCache的大小，Oracle等支持游标的数据库，打开此开关，会以数量级提升性能，具体查阅PSCache相关资料
+#      max-pool-prepared-statement-per-connection-size: ${global.database.pool.default.max-pool-prepared-statement-per-connection-size:20}
+#
+
+easy:
+
+  ## swagger默认配置可自定义属性((不配走默认))
+  swagger:
+    enabled: true
+    title: 测试分组
+    version: 1.2
+    group:
+      test: com.easycode8.datasource.dynamic.sample.service

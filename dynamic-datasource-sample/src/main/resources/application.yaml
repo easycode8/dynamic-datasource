@@ -1,0 +1,29 @@
+
+server:
+  port: 8000
+
+
+
+## 全局异常处理依赖国际化处理
+spring:
+  profiles:
+    active: h2,dynamic
+  messages:
+    basename: i18n/messages
+
+
+management:
+  endpoints:
+    web:
+      # springboot 2.1.6 引入actuator需要声明导出的接口，否则不会像早期版本那样自动映射出去
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      # 显示详细健康信息 never：默认从不显示 always：对所有用户都显示 when-authorized：只对已授权的用户才作显示，可通过配置 management.endpoint.health.roles来配置授权角色。
+      show-details: always
+
+maven:
+  project:
+    version: '@project.version@' # 建议使用单引号应用起来否则非打包(package/install)运行场景下，无法解析@字符
+    artifactId: '@project.artifactId@'

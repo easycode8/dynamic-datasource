@@ -1,0 +1,36 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="zhangsan" id="account.createTable">
+        <createTable tableName="account" remarks="账号表">
+            <!--设置id自增 起始位置从10000 每次加1-->
+            <column name="id" remarks="账户ID" type="bigint" autoIncrement="true" incrementBy="1" startWith="10000">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <!--用户名增加唯一索引-->
+            <column name="username" remarks="用户名" type="VARCHAR(32)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uniq_username"/>
+            </column>
+            <column name="password" remarks="密码" type="VARCHAR(32)"/>
+            <column name="name" remarks="姓名" type="VARCHAR(20)"/>
+            <column name="sex" remarks="性别" type="CHAR(1)"/>
+            <column name="phone" remarks="手机" type="VARCHAR(100)"/>
+            <column name="email" remarks="邮件" type="VARCHAR(100)"/>
+            <column name="create_time" remarks="创建时间" type="datetime(0)"/>
+            <column name="update_time" remarks="修改时间" type="datetime(0)"/>
+
+        </createTable>
+    </changeSet>
+
+<!--    <changeSet id="account.addUniqueConstraint_email" author="myron">
+        <addUniqueConstraint tableName="account" columnNames="email" constraintName="uniq_email"></addUniqueConstraint>
+    </changeSet>-->
+
+    <!--loadData:加载 csv 文件到已存在的表中-->
+    <changeSet id="account.loadData" author="zhangsan">
+        <loadData tableName="account" file="db/liquibase/csv/account.csv" >
+        </loadData>
+<!--        <loadUpdateData tableName="account" primaryKey="id" file="../csv/account.csv"/>-->
+    </changeSet>
+
+</databaseChangeLog>

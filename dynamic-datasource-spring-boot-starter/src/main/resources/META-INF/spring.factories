@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.easycode8.datasource.dynamic.autoconfigure.DynamicDataSourceAutoConfiguration, \
+  com.easycode8.datasource.dynamic.autoconfigure.DynamicTransactionAutoConfiguration, \
+  com.easycode8.datasource.dynamic.autoconfigure.DynamicDataSourceWebAutoConfiguration
