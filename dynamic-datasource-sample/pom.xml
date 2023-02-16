@@ -78,9 +78,17 @@
             <version>3.4.2</version>
         </dependency>
 
+        <!--开启动态数据源切换-->
         <dependency>
             <groupId>com.easycode8</groupId>
             <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!--开启动态数据源web管理-->
+        <dependency>
+            <groupId>com.easycode8</groupId>
+            <artifactId>dynamic-datasource-web</artifactId>
             <version>${revision}</version>
         </dependency>
 

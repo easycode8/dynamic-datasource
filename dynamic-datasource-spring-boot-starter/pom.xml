@@ -29,11 +29,6 @@
             <version>${revision}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.easycode8</groupId>
-            <artifactId>dynamic-datasource-web</artifactId>
-            <version>${revision}</version>
-        </dependency>
     </dependencies>
     
 </project>

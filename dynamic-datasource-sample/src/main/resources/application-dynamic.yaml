@@ -66,12 +66,3 @@ spring:
 #      max-pool-prepared-statement-per-connection-size: ${global.database.pool.default.max-pool-prepared-statement-per-connection-size:20}
 #
 
-easy:
-
-  ## swagger默认配置可自定义属性((不配走默认))
-  swagger:
-    enabled: true
-    title: 测试分组
-    version: 1.2
-    group:
-      test: com.easycode8.datasource.dynamic.sample.service

@@ -156,7 +156,7 @@
 
                         render: (h, params) => {
                             return h('div', [
-                                h('Button', {
+            /*                    h('Button', {
                                     props: {type: 'primary', size: 'small'},
                                     style: {marginRight: '5px'},
                                     on: {
@@ -173,7 +173,7 @@
                                             userVM.modalShowUserEdit(params.index);
                                         }
                                     }
-                                }, 'Edit'),
+                                }, 'Edit'),*/
                                 h('Button', {
                                     props: {
                                         type: 'error', size: 'small'
@@ -250,7 +250,7 @@
                 this.axios.get('dynamic-datasource-ui/list', {
                     params: {}
                 }).then(function (response) {
-                    vm.log.data = response.data;
+                    vm.log.data = response.data.data;
 
                 })
             }

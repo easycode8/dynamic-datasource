@@ -5,6 +5,7 @@ import com.easycode8.datasource.dynamic.core.DataSourceInfo;
 import com.easycode8.datasource.dynamic.core.DynamicDataSourceManager;
 import com.easycode8.datasource.dynamic.core.util.SpringExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class LoginController {
     @Autowired
     private DynamicDataSourceManager dynamicDataSourceManager;
 
-    @RequestMapping("/dynamic-datasource.html")
+    @GetMapping ("/dynamic-datasource.html")
     public String index(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
 
         String apiPrefix = "/";
@@ -39,14 +40,14 @@ public class LoginController {
     }
 
     @GetMapping("/dynamic-datasource-ui/list")
-    @ResponseBody
-    public List<DataSourceInfo> list() {
-        return dynamicDataSourceManager.listAllDataSourceInfo();
+    public ResponseEntity<Map<String, Object>> list() {
+        Map<String, Object> result = new HashMap<>();
+        result.put("data", dynamicDataSourceManager.listAllDataSourceInfo());
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/dynamic-datasource-ui/add")
-    @ResponseBody
-    public Map<String, Object> add(@RequestBody DataSourceInfo info) {
+    public ResponseEntity<Map<String, Object>> add(@RequestBody DataSourceInfo info) {
         Map<String, Object> result = new HashMap<>();
         result.put("message", "新增数据源成功");
         try {
@@ -57,12 +58,11 @@ public class LoginController {
                 result.put("success", false);
             });
         }
-        return result;
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/dynamic-datasource-ui/remove")
-    @ResponseBody
-    public Map<String, Object> remove(DataSourceInfo info) {
+    public ResponseEntity<Map<String, Object>> remove(DataSourceInfo info) {
         Map<String, Object> result = new HashMap<>();
         SpringExceptionUtils.runIgnoreException(() -> {
                     dynamicDataSourceManager.removeDynamicDataSource(info.getKey());
@@ -72,7 +72,7 @@ public class LoginController {
                     result.put("message", "移除数据源失败:" + e.getMessage());
                     result.put("success", false);
                 });
-        return result;
+        return ResponseEntity.ok(result);
     }
 
 }
