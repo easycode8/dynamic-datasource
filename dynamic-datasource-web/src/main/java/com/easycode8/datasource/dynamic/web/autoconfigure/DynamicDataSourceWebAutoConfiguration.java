@@ -2,7 +2,7 @@ package com.easycode8.datasource.dynamic.web.autoconfigure;
 
 import com.easycode8.datasource.dynamic.core.DynamicDataSourceManager;
 import com.easycode8.datasource.dynamic.web.LiquiBaseSupportController;
-import com.easycode8.datasource.dynamic.web.LoginController;
+import com.easycode8.datasource.dynamic.web.DynamicDataSourceController;
 import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -16,8 +16,8 @@ import org.springframework.context.annotation.Configuration;
 public class DynamicDataSourceWebAutoConfiguration {
 
     @Bean
-    public LoginController loginController() {
-        return new LoginController();
+    public DynamicDataSourceController dynamicDataSourceController() {
+        return new DynamicDataSourceController();
     }
 
 

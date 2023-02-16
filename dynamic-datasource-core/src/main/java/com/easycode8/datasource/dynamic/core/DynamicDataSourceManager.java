@@ -42,8 +42,7 @@ public class DynamicDataSourceManager implements InitializingBean {
         // 测试数据源是否正常连接
         DataSourceCreator creator = dataSourceCreatorMap.get(dataSourceInfo.getType());
         DataSource dataSource = creator.createDataSource(dataSourceInfo);
-/*        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        jdbcTemplate.execute("select 1;");*/
+        this.checkDataSource(dataSource);
         dynamicDataSource.add(dataSourceInfo.getKey(), dataSource);
     }
 
@@ -68,9 +67,7 @@ public class DynamicDataSourceManager implements InitializingBean {
         for (Map.Entry<String, DataSource> item : dynamicDataSource.getDynamicDataSourceMap().entrySet()) {
             DataSource dataSource = item.getValue();
             try {
-                JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-                // TODO 不同数据库不通用
-                //jdbcTemplate.execute("select 1;");
+                this.checkDataSource(dataSource);
                 LOGGER.info("dynamic datasource[{}] test jdbc connection is success!", item.getKey());
             } catch (Exception ex) {
                 if (forceCheck) {
@@ -89,6 +86,12 @@ public class DynamicDataSourceManager implements InitializingBean {
             throw new IllegalStateException("dynamicDataSource not set");
         }
         this.checkAllDataSource(dataSourceProperties.getCheck());
+    }
+
+    private void checkDataSource(DataSource dataSource) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        // 不同数据库不通用
+        jdbcTemplate.execute("select 1 from dual");
     }
 
 
