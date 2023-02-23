@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>dynamic-datasource</artifactId>
-        <groupId>com.easycode8</groupId>
+        <groupId>io.github.easycode8</groupId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -19,7 +19,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.easycode8</groupId>
+            <groupId>io.github.easycode8</groupId>
             <artifactId>dynamic-datasource-core</artifactId>
             <version>${revision}</version>
         </dependency>

@@ -5,7 +5,7 @@
 
     <parent>
         <artifactId>dynamic-datasource</artifactId>
-        <groupId>com.easycode8</groupId>
+        <groupId>io.github.easycode8</groupId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -24,7 +24,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.easycode8</groupId>
+            <groupId>io.github.easycode8</groupId>
             <artifactId>dynamic-datasource-core</artifactId>
             <version>${revision}</version>
         </dependency>
