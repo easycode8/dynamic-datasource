@@ -2,6 +2,7 @@ package com.easycode8.datasource.dynamic.core.annotation;
 
 import com.alibaba.druid.filter.Filter;
 import com.alibaba.druid.pool.DruidDataSource;
+import com.easycode8.datasource.dynamic.core.DefaultDynamicDataSourceManager;
 import com.easycode8.datasource.dynamic.core.provider.DataSourceProvider;
 import com.easycode8.datasource.dynamic.core.DynamicDataSource;
 import com.easycode8.datasource.dynamic.core.DynamicDataSourceManager;
@@ -32,8 +33,9 @@ public class DynamicDataSourceConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public DynamicDataSourceManager dynamicDataSourceManager(DynamicDataSource dynamicDataSource, List<DataSourceCreator> dataSourceCreator, DynamicDataSourceProperties dataSourceProperties) {
-        return new DynamicDataSourceManager(dynamicDataSource, dataSourceCreator, dataSourceProperties);
+        return new DefaultDynamicDataSourceManager(dynamicDataSource, dataSourceCreator, dataSourceProperties);
     }
 
     @Bean
