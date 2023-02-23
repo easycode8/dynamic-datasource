@@ -7,7 +7,7 @@ public class DataSourceInfo {
 
     private String key;
     private String driverClassName;
-    private String jdbcUrl;
+    private String url;
     private String username;
     private String password;
     /** 数据源类型*/
@@ -29,12 +29,12 @@ public class DataSourceInfo {
         this.driverClassName = driverClassName;
     }
 
-    public String getJdbcUrl() {
-        return jdbcUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public void setJdbcUrl(String jdbcUrl) {
-        this.jdbcUrl = jdbcUrl;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getUsername() {
@@ -69,10 +69,10 @@ public class DataSourceInfo {
     public static final class Builder {
         private String key;
         private String driverClassName;
-        private String jdbcUrl;
+        private String url;
         private String username;
         private String password;
-        private String type;
+        private String type = "default";
 
         private Builder() {
         }
@@ -91,8 +91,8 @@ public class DataSourceInfo {
             return this;
         }
 
-        public Builder jdbcUrl(String jdbcUrl) {
-            this.jdbcUrl = jdbcUrl;
+        public Builder url(String url) {
+            this.url = url;
             return this;
         }
 
@@ -115,10 +115,10 @@ public class DataSourceInfo {
             DataSourceInfo dataSourceInfo = new DataSourceInfo();
             dataSourceInfo.setKey(key);
             dataSourceInfo.setDriverClassName(driverClassName);
-            dataSourceInfo.setJdbcUrl(jdbcUrl);
             dataSourceInfo.setUsername(username);
             dataSourceInfo.setPassword(password);
             dataSourceInfo.setType(type);
+            dataSourceInfo.url = this.url;
             return dataSourceInfo;
         }
     }

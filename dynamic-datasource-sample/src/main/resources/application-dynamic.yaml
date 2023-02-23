@@ -14,20 +14,18 @@ spring:
       datasource:
         master:
           driver-class-name: org.h2.Driver
-          #jdbc-url: jdbc:h2:mem:test #内存模式(多数据源需要使用jdbc-url替代url才能注入DataSource属性中)
-          jdbc-url: jdbc:h2:file:.\target\temp\h2\db01  # 文件模式
+          url: jdbc:h2:file:.\target\temp\h2\db01  # 文件模式
           username: root
           password: EJAisMC4a7NxS/eEpNoe7skuuR8c17iA42tsL3hDi8Stkos3JE4KXdveZjQhPyJuBknqM8rO96EHebPno8yGfA==
           type: com.alibaba.druid.pool.DruidDataSource
         db1:
           driver-class-name: org.h2.Driver
-          #jdbc-url: jdbc:h2:mem:test #内存模式(多数据源需要使用jdbc-url替代url才能注入DataSource属性中)
-          jdbc-url: jdbc:h2:file:.\target\temp\h2\db02  # 文件模式
+          url: jdbc:h2:file:.\target\temp\h2\db02  # 文件模式
           username: root
           password: 123456
         db2:
           driver-class-name: com.mysql.jdbc.Driver
-          jdbc-url: jdbc:mysql://192.168.4.187:3306/test?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true
+          url: jdbc:mysql://192.168.4.187:3306/test?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true
           username: root
           password: 123456
 

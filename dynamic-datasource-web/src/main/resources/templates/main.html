@@ -22,8 +22,8 @@
             <i-Input type="text" v-model="datasource.key" placeholder="数据源key">
             </i-Input>
         </Form-Item>
-        <Form-Item label="jdbcUrl" prop="jdbcUrl">
-            <i-Input type="text" v-model="datasource.jdbcUrl" placeholder="jdbc连接">
+        <Form-Item label="url" prop="url">
+            <i-Input type="text" v-model="datasource.url" placeholder="jdbc连接">
             </i-Input>
         </Form-Item>
         <Form-Item label="username" prop="username">
@@ -123,8 +123,8 @@
             //user:window.globalConfig.user,
             datasource: {
                 key: "test",
-                //jdbcUrl: "jdbc:h2:mem:test",
-                jdbcUrl: "jdbc:mysql://192.168.4.187:3306/test?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true",
+                //url: "jdbc:h2:mem:test",
+                url: "jdbc:mysql://192.168.4.187:3306/test?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true",
                 username: 'abc',
                 password: 'adb'
             },
@@ -147,7 +147,7 @@
                         align: 'center'
                     },
                     {title: 'key', key: 'key'},
-                    {title: 'jdbcUrl', key: 'jdbcUrl', width:300},
+                    {title: 'url', key: 'url', width:300},
                     {title: 'username', key: 'username'},
                     {title: 'password', key: 'password', width: 200},
 
@@ -376,7 +376,7 @@
 
                 this.axios.post('/dynamic-datasource-ui/add', {
                     key: model.key,
-                    jdbcUrl: model.jdbcUrl,
+                    url: model.url,
                     username: model.username,
                     password: model.password
                 }).then(function (response) {

@@ -28,7 +28,7 @@ public class DruidDataSourceCreator extends AbstractDataSourceCreator{
     public DataSource doCreateDataSource(DataSourceInfo dataSourceInfo) throws Exception {
 
         DruidDataSource dataSource = Binder.get(environment).bindOrCreate("spring.datasource.druid", DruidDataSource.class);
-        dataSource.setUrl(dataSourceInfo.getJdbcUrl());
+        dataSource.setUrl(dataSourceInfo.getUrl());
         dataSource.setUsername(dataSourceInfo.getUsername());
         dataSource.setPassword(dataSourceInfo.getPassword());
         dataSource.setDriverClassName(dataSourceInfo.getDriverClassName());

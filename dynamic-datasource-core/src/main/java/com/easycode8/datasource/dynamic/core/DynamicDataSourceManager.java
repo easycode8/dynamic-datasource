@@ -54,7 +54,7 @@ public class DynamicDataSourceManager implements InitializingBean {
             String driverClassName = (String) SpringReflectionUtils.invokeMethod(item.getValue(), item.getValue().getClass(), "getDriverClassName");;
             return DataSourceInfo.builder()
                     .key(item.getKey())
-                    .jdbcUrl(url)
+                    .url(url)
                     .username(username)
                     .password(password)
                     .driverClassName(driverClassName)

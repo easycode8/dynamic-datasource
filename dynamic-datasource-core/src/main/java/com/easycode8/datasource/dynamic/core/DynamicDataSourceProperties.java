@@ -22,12 +22,12 @@ public class DynamicDataSourceProperties {
      *       datasource:
      *         master:
      *           driver-class-name: org.h2.Driver
-     *           jdbc-url: jdbc:h2:mem:test
+     *           url: jdbc:h2:mem:test
      *           username: root
      *           password: 123456
      *         db1:
      *           driver-class-name: org.h2.Driver
-     *           jdbc-url: jdbc:h2:mem:test1
+     *           url: jdbc:h2:mem:test1
      *           username: root
      *           password: 123456
      *

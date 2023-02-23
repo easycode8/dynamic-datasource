@@ -13,7 +13,7 @@ public class DefaultDataSourceCreator extends AbstractDataSourceCreator{
         // !!!该数据源没有使用连接池
 //        DriverManagerDataSource dataSource = new DriverManagerDataSource();
 //        dataSource.setDriverClassName(info.getDriverClassName());
-//        dataSource.setUrl(info.getJdbcUrl());
+//        dataSource.setUrl(info.getUrl());
 //        dataSource.setUsername(info.getUsername());
 //        dataSource.setPassword(info.getPassword());
 //        return dataSource;
@@ -22,7 +22,7 @@ public class DefaultDataSourceCreator extends AbstractDataSourceCreator{
         return  DataSourceBuilder.create()
                 .password(info.getPassword())
                 .username(info.getUsername())
-                .url(info.getJdbcUrl())
+                .url(info.getUrl())
                 .type(this.getType())
                 // 指定数据源类型 不是必须的DataSourceBuilder会根据url推断
                 //.type(DruidDataSource.class)
