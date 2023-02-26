@@ -3,7 +3,9 @@ package com.easycode8.datasource.dynamic.core.provider;
 import com.easycode8.datasource.dynamic.core.DataSourceInfo;
 import com.easycode8.datasource.dynamic.core.DynamicDataSourceProperties;
 import com.easycode8.datasource.dynamic.core.creator.DataSourceCreator;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,6 +21,9 @@ public class YmlDataSourceProvider extends AbstractDataSourceProvider {
     @Override
     public List<DataSourceInfo> loadDataSourceInfo() {
         Map<String, DataSourceInfo> datasource = dataSourceProperties.getDatasource();
+        if (CollectionUtils.isEmpty(datasource)) {
+            return new ArrayList<>();
+        }
         return datasource.entrySet().stream().map(item -> {
             item.getValue().setKey(item.getKey());
             return item.getValue();
