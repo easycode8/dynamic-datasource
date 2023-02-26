@@ -52,7 +52,6 @@ public class DynamicDataSourceConfiguration {
 
     @Bean
     public DefaultDataSourceCreator defaultDataSourceCreator() {
-        //默认使用DriverManagerDataSourceCreator 无连接池的数据源
         return new DefaultDataSourceCreator();
     }
 

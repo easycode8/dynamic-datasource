@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>测试aop日志</title>
+    <title>动态数据源</title>
 
     <script type="text/javascript" th:src="${front.vue_js}"></script>
     <script type="text/javascript" th:src="${front.axios_js}"></script>
@@ -10,8 +10,6 @@
     <script type="text/javascript" th:src="${front.iview_js}"></script>
 </head>
 <body>
-<div id="app-user"></div>
-
 
 <div id="app-log">
 
@@ -128,10 +126,6 @@
                 username: 'abc',
                 password: 'adb'
             },
-            formInline: {
-                username: '',
-                password: ''
-            },
 
             log: {
                 // 列表数据
@@ -189,38 +183,7 @@
                     }],
                 // 被选中行
                 selectedItem: [],
-                // 查询表单模型
-                formSearch: {
-                    model: {
-                        logId: '',
-                        type: '',
-                        title: '',
-                        description: '',
-                    }
-                },
-                // 添加/修改表单模型
-                form: {
-                    isEditModalShow: false,
-                    isAddModalShow: false,
-                    model: {
-                        logId: '',
-                        type: '',
-                        title: '',
-                        description: '',
-                        ip: '',
-                        requestUri: '',
-                        method: '',
-                        params: '',
-                        exception: '',
-                        operateDate: '',
-                        timeout: '',
-                        loginName: '',
-                        requestId: '',
-                        dataSnapshot: '',
-                        requestTimestamp: '',
-                        status: ''
-                    }
-                }
+
             }
 
         },

@@ -25,10 +25,6 @@
     </appender>
 
     <!--additivity="false" 表示只用当前logger的appender-ref-->
-    <logger name="com.easy.common.demo" additivity="true" level="debug">
-        <appender-ref ref="dailyFile" />
-    </logger>
-
     <logger name="com.easycode8.datasource.dynamic" additivity="true" level="DEBUG"/>
 
 
