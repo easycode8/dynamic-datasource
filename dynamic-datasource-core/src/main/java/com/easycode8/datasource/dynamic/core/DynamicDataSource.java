@@ -54,11 +54,11 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Disp
 
     @Override
     public Connection getConnection() throws SQLException {
-        // TODO 执行获取连接过程有任何报错需要finally释放连接
         String lookupKey = this.determineCurrentLookupKey().toString();
         if (!TransactionSynchronizationManager.isActualTransactionActive()) {
-            Connection connection = new ConnectionProxy(super.getConnection(), lookupKey);
-            LOGGER.info("Create No Dynamic JDBC Transaction connection:{}", connection);
+            Connection connection = new DynamicConnectionProxy(super.getConnection(), lookupKey);
+
+            LOGGER.info("Acquired {} for Dynamic JDBC no transaction", connection);
             return connection;
         }
         // 根据动态数据源获取当前线程中活跃的连接状态

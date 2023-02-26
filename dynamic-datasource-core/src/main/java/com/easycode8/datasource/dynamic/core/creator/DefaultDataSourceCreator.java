@@ -24,8 +24,6 @@ public class DefaultDataSourceCreator extends AbstractDataSourceCreator{
                 .username(info.getUsername())
                 .url(info.getUrl())
                 .type(this.getType())
-                // 指定数据源类型 不是必须的DataSourceBuilder会根据url推断
-                //.type(DruidDataSource.class)
                 .build();
     }
 
