@@ -35,7 +35,7 @@ public class DynamicDataSourceController {
         front.put("vue_js", apiPrefix + "webjars/dynamic-datasource-ui/vue/vue.js");
         front.put("axios_js", apiPrefix + "webjars/dynamic-datasource-ui/axios/axios.min.js");
         model.addAttribute("front", front);
-        return "main";
+        return "dynamic-datasource";
     }
 
     @GetMapping("/dynamic-datasource-ui/list")

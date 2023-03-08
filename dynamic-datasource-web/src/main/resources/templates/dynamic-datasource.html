@@ -11,9 +11,9 @@
 </head>
 <body>
 
-<div id="app-log">
+<div id="app-dynamic">
 
-
+    <Divider orientation="left">动态数据源管理</Divider>
     <i-Form ref="formSearchUser" :model="datasource" :label-width="60" inline>
 
         <Form-Item label="key" prop="key">
@@ -89,10 +89,10 @@
     }, function (error) {
         // 对响应错误做点什么
         if (error.status == 403) {
-            logVM.log.form.isAddModalShow = true;
+            dynamicVM.log.form.isAddModalShow = true;
             window.globalConfig.user = "";
             // 补充requestId提示
-            logVM.$Modal.warning({
+            dynamicVM.$Modal.warning({
                 title: '提示403',
                 content: error.data.msg + "<br> requestId:" + error.headers.requestid
             });
@@ -115,8 +115,8 @@
 
     Vue.prototype.axios = instance;
 
-    var logVM = new Vue({
-        el: '#app-log',
+    var dynamicVM = new Vue({
+        el: '#app-dynamic',
         data: {
             //user:window.globalConfig.user,
             datasource: {
@@ -174,7 +174,7 @@
                                     },
                                     on: {
                                         click: () => {
-                                            logVM.logRemove(params.index)
+                                            dynamicVM.logRemove(params.index)
                                         }
                                     }
                                 }, '移除')
@@ -189,7 +189,7 @@
         },
         created: function () {
 
-            this.loadLogs(this.log.pageNum, this.log.pageSize);
+            this.loadDatasource(this.log.pageNum, this.log.pageSize);
 
         }
         ,
@@ -203,11 +203,11 @@
             ,
             // 提交查询
             handleSearchSubmit() {
-                this.loadLogs(0, this.log.pageSize);
+                this.loadDatasource(0, this.log.pageSize);
             }
             ,
             //分页加载数据
-            loadLogs: function (pageNum, pageSize) {
+            loadDatasource: function (pageNum, pageSize) {
                 var vm = this;
 
                 this.axios.get('dynamic-datasource-ui/list', {
@@ -221,14 +221,14 @@
             //页码变更
             logChangePage: function (val) {
                 this.log.pageNum = val;
-                this.loadLogs(this.log.pageNum, this.log.pageSize);
+                this.loadDatasource(this.log.pageNum, this.log.pageSize);
                 console.log(val);
             }
             ,
             //页大小变更
             logChangePageSize: function (val) {
                 this.log.pageSize = val;
-                this.loadLogs(this.log.pageNum, this.log.pageSize);
+                this.loadDatasource(this.log.pageNum, this.log.pageSize);
                 console.log(val);
             }
             ,
@@ -267,7 +267,7 @@
                         vm.$Message.success(result.message);
                     } else {
                         vm.$Message.warning(result.message);
-                        vm.loadLogs(vm.log.pageNum, vm.log.pageSize);
+                        vm.loadDatasource(vm.log.pageNum, vm.log.pageSize);
                     }
 
                 })
@@ -297,7 +297,7 @@
                             content: response.data.msg
                         });
                     }
-                    vm.loadLogs(vm.log.pageNum, vm.log.pageSize);
+                    vm.loadDatasource(vm.log.pageNum, vm.log.pageSize);
                 })
             }
             ,
@@ -321,7 +321,7 @@
                             content: response.data.msg
                         });
                     }
-                    vm.loadLogs(vm.log.pageNum, vm.log.pageSize);
+                    vm.loadDatasource(vm.log.pageNum, vm.log.pageSize);
                 })
             }
             ,
@@ -354,7 +354,7 @@
                             content: response.data.message
                         });
                     }
-                    vm.loadLogs(vm.log.pageNum, vm.log.pageSize);
+                    vm.loadDatasource(vm.log.pageNum, vm.log.pageSize);
                 }).catch(function (error) {
 
                 })
