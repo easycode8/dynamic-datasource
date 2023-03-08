@@ -7,6 +7,7 @@ import com.easycode8.datasource.dynamic.core.transaction.TransactionSynchronizat
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -25,20 +26,22 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DynamicDataSource extends AbstractRoutingDataSource implements DisposableBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamicDataSource.class);
     private ConcurrentHashMap<String, DataSource> dynamicDataSourceMap = new ConcurrentHashMap<>();
-    private final DynamicDataSourceProperties dataSourceProperties;
+    private final DataSourceProperties dataSourceProperties;
+    private final DynamicDataSourceProperties dynamicDataSourceProperties;
     private final List<DataSourceProvider> dataSourceProviders;
 
 
 
-    public DynamicDataSource(DynamicDataSourceProperties dataSourceProperties, List<DataSourceProvider> dataSourceProviders) {
+    public DynamicDataSource(DataSourceProperties dataSourceProperties, DynamicDataSourceProperties dynamicDataSourceProperties, List<DataSourceProvider> dataSourceProviders) {
         this.dataSourceProperties = dataSourceProperties;
+        this.dynamicDataSourceProperties = dynamicDataSourceProperties;
         this.dataSourceProviders = dataSourceProviders;
     }
 
     @Override
     protected Object determineCurrentLookupKey() {
         String lookupKey = DynamicDataSourceHolder.peek();
-        return StringUtils.isEmpty(lookupKey)? dataSourceProperties.getPrimary() : lookupKey;
+        return StringUtils.isEmpty(lookupKey)? dynamicDataSourceProperties.getPrimary() : lookupKey;
     }
 
 
@@ -108,7 +111,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Disp
 
 
     protected synchronized void remove(String key) {
-        if (dataSourceProperties.getPrimary().equals(key)) {
+        if (dynamicDataSourceProperties.getPrimary().equals(key)) {
             throw new IllegalStateException("primary dynamic datasource cannot remove " + key);
         }
         DataSource dataSource = this.dynamicDataSourceMap.remove(key);
@@ -136,13 +139,13 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Disp
 
 
     private void chooseDefaultDataSource() {
-        DataSource primaryDataSource = dynamicDataSourceMap.get(dataSourceProperties.getPrimary());
+        DataSource primaryDataSource = dynamicDataSourceMap.get(dynamicDataSourceProperties.getPrimary());
         if (primaryDataSource == null) {
-            throw new IllegalStateException("未找到首选数据源:" + dataSourceProperties.getPrimary());
+            throw new IllegalStateException("【easy-model】未找到首选数据源:" + dynamicDataSourceProperties.getPrimary());
         }
         this.setDefaultTargetDataSource(primaryDataSource);
-        LOGGER.info("【easy-model】动态数据源--主源:{}", dataSourceProperties.getPrimary());
-        LOGGER.info("【easy-model】动态数据源--切换请求头:{}", dataSourceProperties.getHeader());
+        LOGGER.info("【easy-model】动态数据源--主源:{}", dynamicDataSourceProperties.getPrimary());
+        LOGGER.info("【easy-model】动态数据源--切换请求头:{}", dynamicDataSourceProperties.getHeader());
     }
 
     private void loadAllDataSource() {
@@ -151,7 +154,13 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Disp
             dynamicDataSourceMap.putAll(provider.loadDataSources());
         }
         if (CollectionUtils.isEmpty(dynamicDataSourceMap)) {
-            throw new IllegalStateException("未读取到动态数据源配置");
+            LOGGER.warn("【easy-model】未读取到动态数据源,使用spring原生数据源作为首选数据源");
+            dynamicDataSourceMap.put(dynamicDataSourceProperties.getPrimary(), dataSourceProperties.initializeDataSourceBuilder().build());
+        } else {
+            if (!dynamicDataSourceMap.containsKey(dynamicDataSourceProperties.getPrimary())) {
+                LOGGER.warn("【easy-model】未设置动态数据源主源,使用spring原生数据源作为首选数据源");
+                dynamicDataSourceMap.put(dynamicDataSourceProperties.getPrimary(), dataSourceProperties.initializeDataSourceBuilder().build());
+            }
         }
         LOGGER.info("【easy-model】动态数据源--加载成功:{}", String.join(",", dynamicDataSourceMap.keySet()));
     }

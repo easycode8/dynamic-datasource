@@ -14,7 +14,9 @@ import com.easycode8.datasource.dynamic.core.creator.DruidDataSourceCreator;
 import com.easycode8.datasource.dynamic.core.provider.YmlDataSourceProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -27,8 +29,9 @@ public class DynamicDataSourceConfiguration {
 
     @Bean(name = "dynamicDataSource")
     @ConditionalOnMissingBean
-    public DynamicDataSource DataSource(DynamicDataSourceProperties dataSourceProperties, List<DataSourceProvider> dataSourceProviders) {
-        DynamicDataSource dataSource = new DynamicDataSource(dataSourceProperties, dataSourceProviders);
+    public DynamicDataSource DataSource(Environment environment, DynamicDataSourceProperties dynamicDataSourceProperties, List<DataSourceProvider> dataSourceProviders) {
+        DataSourceProperties dataSourceProperties = Binder.get(environment).bindOrCreate("spring.datasource", DataSourceProperties.class);
+        DynamicDataSource dataSource = new DynamicDataSource(dataSourceProperties, dynamicDataSourceProperties, dataSourceProviders);
         return dataSource;
     }
 
