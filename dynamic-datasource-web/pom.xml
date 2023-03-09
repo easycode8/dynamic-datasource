@@ -18,6 +18,13 @@
     </properties>
 
     <dependencies>
+        <!--生成spring-configuration-metadata.json 属性提示-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <dependency>
             <groupId>io.github.easycode8</groupId>
             <artifactId>dynamic-datasource-core</artifactId>
