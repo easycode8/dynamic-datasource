@@ -38,7 +38,7 @@
 
 
         <!-- swagger2 -->
-        <springfox-swagger.version>2.7.0</springfox-swagger.version>
+        <springfox-swagger.version>2.10.5</springfox-swagger.version>
         <swagger-bootstrap-ui.version>1.9.6</swagger-bootstrap-ui.version>
     </properties>
 
@@ -88,6 +88,13 @@
                 <artifactId>springfox-swagger-ui</artifactId>
                 <version>${springfox-swagger.version}</version>
                 <scope>compile</scope>
+            </dependency>
+
+            <!--2.10.5版本需要补充该模块 提供@EnableSwagger2WebMvc能力-->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-spring-webmvc</artifactId>
+                <version>${springfox-swagger.version}</version>
             </dependency>
 
             <dependency>
