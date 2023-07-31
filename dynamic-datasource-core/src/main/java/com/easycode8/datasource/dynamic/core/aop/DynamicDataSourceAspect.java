@@ -49,7 +49,8 @@ public class DynamicDataSourceAspect {
 
         String dataBaseType = this.parseDataSourceType(point, dynamicSource);
         if (StringUtils.isNotBlank(dynamicSource.value())) {
-            if (!dataSourceProperties.getDatasource().keySet().contains(dataBaseType)) {
+            // 如果解析出来数据源类型和解析前一样,说明是代码写死得数据源配置而不是运行时动态创建,那么不进行安全检查要求yaml里面一定要配置
+            if (StringUtils.equals(dataBaseType, dynamicSource.value()) && !dataSourceProperties.getDatasource().keySet().contains(dataBaseType)) {
                 throw new IllegalStateException(MessageFormat.format("注解数据源未定义:{0},调整或增加配置:{1}.{0}", dataBaseType, "spring.datasource.dynamic.datasource"));
             }
             LOGGER.debug("动态数据源栈--入栈切换:【{}】注解方式", dataBaseType);

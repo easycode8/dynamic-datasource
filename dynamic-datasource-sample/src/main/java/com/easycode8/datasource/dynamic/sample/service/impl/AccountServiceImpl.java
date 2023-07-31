@@ -57,6 +57,12 @@ public class AccountServiceImpl implements AccountService {
     }
 
 
+    @DynamicSource("#dbType")
+    @Override
+    public List<Account> listAllByDbType(String dbType) {
+        return this.accountMapper.selectList(Wrappers.emptyWrapper());
+    }
+
     private void doCreateAccount(Account account) {
         account.setUsername(UUID.randomUUID().toString().replace("-",""));
         this.accountMapper.insert(account);

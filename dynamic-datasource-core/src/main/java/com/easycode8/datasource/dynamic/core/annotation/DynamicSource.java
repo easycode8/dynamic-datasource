@@ -10,5 +10,4 @@ public @interface DynamicSource {
      * 支持定义数据源类型/spring spel name
      * */
     String value() default "";
-    String spelExpression() default "";
 }
