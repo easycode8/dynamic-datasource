@@ -1,9 +1,9 @@
 package com.easycode8.datasource.dynamic.core.aop;
 
 
-import com.easycode8.datasource.dynamic.core.annotation.DynamicSource;
 import com.easycode8.datasource.dynamic.core.DynamicDataSourceHolder;
 import com.easycode8.datasource.dynamic.core.DynamicDataSourceProperties;
+import com.easycode8.datasource.dynamic.core.annotation.DynamicSource;
 import com.easycode8.datasource.dynamic.core.util.SpringSpelUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
@@ -13,24 +13,21 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 
 @Aspect
-@Order(1) // 这个切面需要比spring的事务管理器的切面先执行, 否则会导致使用默认的数据源
+@Order(1) // 这个切面需要比spring的事务管理器的切面先执行(默认的为Integer.MAX_VALUE,值越小切面越先执行), 否则会导致使用默认的数据源
 public class DynamicDataSourceAspect {
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamicDataSourceAspect.class);
 
 
     private DynamicDataSourceProperties dataSourceProperties;
-
-    @Autowired(required = false)
-    private HttpServletRequest request;
 
     public DynamicDataSourceAspect(DynamicDataSourceProperties dataSourceProperties) {
         this.dataSourceProperties = dataSourceProperties;
@@ -43,6 +40,12 @@ public class DynamicDataSourceAspect {
             return;
         }
         String headerKey = dataSourceProperties.getHeader();
+        HttpServletRequest request = null;
+        try {
+            request = (HttpServletRequest) RequestContextHolder.currentRequestAttributes();
+        } catch (Exception e) {
+            LOGGER.warn("get http error:" + e.getMessage());
+        }
 
         String dataBaseType = this.parseDataSourceType(point, dynamicSource);
         if (StringUtils.isNotBlank(dynamicSource.value())) {
