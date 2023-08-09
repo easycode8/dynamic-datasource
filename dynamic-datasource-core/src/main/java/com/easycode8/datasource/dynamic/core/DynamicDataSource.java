@@ -1,5 +1,6 @@
 package com.easycode8.datasource.dynamic.core;
 
+import com.easycode8.datasource.dynamic.core.exception.DynamicDataSourceNotFoundException;
 import com.easycode8.datasource.dynamic.core.provider.DataSourceProvider;
 import com.easycode8.datasource.dynamic.core.transaction.ConnectionHolder;
 import com.easycode8.datasource.dynamic.core.transaction.ConnectionProxy;
@@ -48,8 +49,13 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Disp
     @Override
     protected DataSource determineTargetDataSource() {
         // 首先在动态多数据源选择
-        if (dynamicDataSourceMap.get(DynamicDataSourceHolder.peek()) != null) {
+        String key = DynamicDataSourceHolder.peek();
+        if (dynamicDataSourceMap.get(key) != null) {
             return dynamicDataSourceMap.get(DynamicDataSourceHolder.peek());
+        }
+        // key不为空情况下,严格使用指定数据源将报错
+        if (!StringUtils.isEmpty(key) && dynamicDataSourceProperties.getStrict()) {
+            throw new DynamicDataSourceNotFoundException("未匹配到数据源:" + key);
         }
         // 没有找到则在静态多数据源寻找
         return super.determineTargetDataSource();

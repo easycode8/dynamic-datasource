@@ -13,6 +13,9 @@ public class DynamicDataSourceProperties {
     private String header = "";
     /** 是否启动时候检查所有数据源有效性,默认false,不检查*/
     private Boolean check = false;
+
+    /** 是否严格匹配数据源,匹配不到报错, 默认true */
+    private Boolean strict = true;
     /** 数据源集合
      * spring:
      *   datasource:
@@ -64,5 +67,13 @@ public class DynamicDataSourceProperties {
 
     public void setCheck(Boolean check) {
         this.check = check;
+    }
+
+    public Boolean getStrict() {
+        return strict;
+    }
+
+    public void setStrict(Boolean strict) {
+        this.strict = strict;
     }
 }
