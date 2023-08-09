@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -40,9 +41,12 @@ public class DynamicDataSourceAspect {
             return;
         }
         String headerKey = dataSourceProperties.getHeader();
+
+        // HttpServletRequest 对象在项目启动后执行不同数据源切换初始化,是非web请求会报错这里兼容这个使用场景忽略报错
         HttpServletRequest request = null;
         try {
-            request = (HttpServletRequest) RequestContextHolder.currentRequestAttributes();
+            ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            request = requestAttributes.getRequest();
         } catch (Exception e) {
             LOGGER.warn("get http error:" + e.getMessage());
         }
