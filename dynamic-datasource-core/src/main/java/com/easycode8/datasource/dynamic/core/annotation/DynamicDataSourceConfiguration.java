@@ -2,11 +2,8 @@ package com.easycode8.datasource.dynamic.core.annotation;
 
 import com.alibaba.druid.filter.Filter;
 import com.alibaba.druid.pool.DruidDataSource;
-import com.easycode8.datasource.dynamic.core.DefaultDynamicDataSourceManager;
+import com.easycode8.datasource.dynamic.core.*;
 import com.easycode8.datasource.dynamic.core.provider.DataSourceProvider;
-import com.easycode8.datasource.dynamic.core.DynamicDataSource;
-import com.easycode8.datasource.dynamic.core.DynamicDataSourceManager;
-import com.easycode8.datasource.dynamic.core.DynamicDataSourceProperties;
 import com.easycode8.datasource.dynamic.core.aop.DynamicDataSourceAspect;
 import com.easycode8.datasource.dynamic.core.creator.DataSourceCreator;
 import com.easycode8.datasource.dynamic.core.creator.DefaultDataSourceCreator;
@@ -29,9 +26,9 @@ public class DynamicDataSourceConfiguration {
 
     @Bean(name = "dynamicDataSource")
     @ConditionalOnMissingBean
-    public DynamicDataSource DataSource(Environment environment, DynamicDataSourceProperties dynamicDataSourceProperties, List<DataSourceProvider> dataSourceProviders) {
+    public DynamicDataSource DataSource(Environment environment, DynamicDataSourceProperties dynamicDataSourceProperties, List<DataSourceProvider> dataSourceProviders, DynamicConnectionProxyFactory dynamicConnectionProxyFactory) {
         DataSourceProperties dataSourceProperties = Binder.get(environment).bindOrCreate("spring.datasource", DataSourceProperties.class);
-        DynamicDataSource dataSource = new DynamicDataSource(dataSourceProperties, dynamicDataSourceProperties, dataSourceProviders);
+        DynamicDataSource dataSource = new DynamicDataSource(dataSourceProperties, dynamicDataSourceProperties, dataSourceProviders, dynamicConnectionProxyFactory);
         return dataSource;
     }
 
@@ -56,6 +53,12 @@ public class DynamicDataSourceConfiguration {
     @Bean
     public DefaultDataSourceCreator defaultDataSourceCreator() {
         return new DefaultDataSourceCreator();
+    }
+
+    @ConditionalOnMissingBean
+    @Bean
+    public DynamicConnectionProxyFactory dynamicConnectionProxyFactory() {
+        return new DefaultDynamicConnectionProxyFactory();
     }
 
     @ConditionalOnClass(DruidDataSource.class)

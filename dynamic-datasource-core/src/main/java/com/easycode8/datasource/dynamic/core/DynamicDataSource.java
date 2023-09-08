@@ -3,12 +3,12 @@ package com.easycode8.datasource.dynamic.core;
 import com.easycode8.datasource.dynamic.core.exception.DynamicDataSourceNotFoundException;
 import com.easycode8.datasource.dynamic.core.provider.DataSourceProvider;
 import com.easycode8.datasource.dynamic.core.transaction.ConnectionHolder;
-import com.easycode8.datasource.dynamic.core.transaction.ConnectionProxy;
 import com.easycode8.datasource.dynamic.core.transaction.TransactionSynchronizationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -30,13 +30,15 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Disp
     private final DataSourceProperties dataSourceProperties;
     private final DynamicDataSourceProperties dynamicDataSourceProperties;
     private final List<DataSourceProvider> dataSourceProviders;
+    private final DynamicConnectionProxyFactory dynamicConnectionProxyFactory;
 
 
 
-    public DynamicDataSource(DataSourceProperties dataSourceProperties, DynamicDataSourceProperties dynamicDataSourceProperties, List<DataSourceProvider> dataSourceProviders) {
+    public DynamicDataSource(DataSourceProperties dataSourceProperties, DynamicDataSourceProperties dynamicDataSourceProperties, List<DataSourceProvider> dataSourceProviders, DynamicConnectionProxyFactory dynamicConnectionProxyFactory) {
         this.dataSourceProperties = dataSourceProperties;
         this.dynamicDataSourceProperties = dynamicDataSourceProperties;
         this.dataSourceProviders = dataSourceProviders;
+        this.dynamicConnectionProxyFactory = dynamicConnectionProxyFactory;
     }
 
     @Override
@@ -64,30 +66,37 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Disp
     @Override
     public Connection getConnection() throws SQLException {
         String lookupKey = this.determineCurrentLookupKey().toString();
-        if (!TransactionSynchronizationManager.isActualTransactionActive()) {
-            Connection connection = new DynamicConnectionProxy(super.getConnection(), lookupKey);
+        Connection connection = null;
+        try {
 
-            LOGGER.info("Acquired {} for Dynamic JDBC no transaction", connection);
+            if (!TransactionSynchronizationManager.isActualTransactionActive()) {
+                connection = super.getConnection();
+                connection = dynamicConnectionProxyFactory.createProxy(connection, lookupKey);
+                LOGGER.info("Acquired {} for Dynamic JDBC no transaction", connection);
+                return connection;
+            }
+            // 根据动态数据源获取当前线程中活跃的连接状态
+            ConnectionHolder connectionHolder = (ConnectionHolder) TransactionSynchronizationManager.getResource(this);
+            Assert.notNull(connectionHolder, "事务中获取根据动态数据源获取连接connectionHolder不能为空");
+            connection = connectionHolder.getConnection(lookupKey);
+            if (connection != null) {
+                return connection;
+            }
+
+            // 获取当前数据源的连接设置手动提交
+            connection = dynamicConnectionProxyFactory.createProxy(connection, lookupKey);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Acquired ConnectionProxy [" + connection + "] for Dynamic JDBC transaction");
+            }
+            connection.setAutoCommit(false);
+            connectionHolder.putConnection(lookupKey, connection);
+
             return connection;
-        }
-        // 根据动态数据源获取当前线程中活跃的连接状态
-        ConnectionHolder connectionHolder = (ConnectionHolder) TransactionSynchronizationManager.getResource(this);
-        Assert.notNull(connectionHolder, "事务中获取根据动态数据源获取连接connectionHolder不能为空");
-        Connection connection = connectionHolder.getConnection(lookupKey);
-        if (connection != null) {
-            return connection;
+        } catch (Exception e) {
+            DataSourceUtils.releaseConnection(connection,this);
+            throw e;
         }
 
-        // 获取当前数据源的连接设置手动提交
-        connection = new ConnectionProxy(super.getConnection(), lookupKey);
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Acquired ConnectionProxy [" + connection + "] for Dynamic JDBC transaction");
-        }
-        connection.setAutoCommit(false);
-        // ...设置连接的事务隔离级别//是否只读
-        connectionHolder.putConnection(lookupKey, connection);
-
-        return connection;
 
     }
 

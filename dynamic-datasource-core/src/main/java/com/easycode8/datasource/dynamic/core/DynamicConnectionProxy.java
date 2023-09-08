@@ -1,5 +1,8 @@
 package com.easycode8.datasource.dynamic.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
@@ -9,9 +12,12 @@ import java.util.concurrent.Executor;
  * 连接代理表示当前连接时哪个数据源持有的。
  */
 public class DynamicConnectionProxy implements Connection {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DynamicConnectionProxy.class);
     private Connection connection;
+
     // 标识当前连接是哪个数据源拥有的
     private String owner;
+
 
     public DynamicConnectionProxy(Connection connection, String owner) {
         this.connection = connection;
@@ -20,17 +26,18 @@ public class DynamicConnectionProxy implements Connection {
 
     @Override
     public void commit() throws SQLException {
-         connection.commit();
+        connection.commit();
     }
 
     @Override
     public void rollback() throws SQLException {
-         connection.rollback();
+        connection.rollback();
     }
 
     @Override
     public void close() throws SQLException {
-         connection.close();
+        LOGGER.info("DynamicConnectionProxy[{}] closed by {}", owner, connection.toString());
+        connection.close();
     }
 
     @Override

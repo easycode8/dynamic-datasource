@@ -6,6 +6,8 @@ server:
 
 ## 全局异常处理依赖国际化处理
 spring:
+  application:
+    name: sample-service
   profiles:
     active: h2,dynamic
   messages:

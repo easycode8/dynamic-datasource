@@ -69,9 +69,10 @@ public class DefaultDynamicDataSourceManager implements DynamicDataSourceManager
         for (Map.Entry<String, DataSource> item : dynamicDataSource.getDynamicDataSourceMap().entrySet()) {
             DataSource dataSource = item.getValue();
             try {
+                LOGGER.info("dynamic datasource[{}] test jdbc connection start...", item.getKey());
                 this.checkDataSource(dataSource);
                 LOGGER.info("dynamic datasource[{}] test jdbc connection is success!", item.getKey());
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 if (forceCheck) {
                     throw new IllegalStateException("dynamic datasource[" + item.getKey() + "] CannotGetJdbcConnectionException:" + ex.getMessage(), ex);
                 }
