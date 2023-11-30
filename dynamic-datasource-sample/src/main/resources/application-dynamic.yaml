@@ -10,7 +10,8 @@ spring:
         enabled: false #是否开启动态数据源事务,默认为true
       header: db-type #是否开启请求头切换,默认为空则不开启,优先级低于注解配置
       primary: master #首选数据源, 未指定数据源情况下使用的数据源,一般设置未主数据源, 默认master
-      check: true
+      check: true #是否启动时候检查所有数据源有效性,默认true,检查通过才启动项目
+      strict: true #是否严格匹配数据源,匹配不到报错, 默认true
       datasource:
         master:
           driver-class-name: org.h2.Driver

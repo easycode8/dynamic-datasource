@@ -151,14 +151,14 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Disp
         return JdbcUrlParserUtils.extractDatabaseType(jdbcUrl);
     }
 
-    private void closeDataSource(String dsName, DataSource dataSource) {
+    protected void closeDataSource(String dsName, DataSource dataSource) {
         LOGGER.info("[dynamic-datasource] close dynamic datasource :{}", dsName);
         Method closeMethod = ReflectionUtils.findMethod(dataSource.getClass(), "close");
         if (closeMethod != null) {
             try {
                 closeMethod.invoke(dataSource);
             } catch (Exception e) {
-                LOGGER.error("[dynamic-datasource] close dynamic datasource:{}", dsName, e);
+                LOGGER.error("[dynamic-datasource] close dynamic datasource[{}] error", dsName, e);
             }
         }
     }

@@ -11,8 +11,8 @@ public class DynamicDataSourceProperties {
     private String primary = "master";
     /** 请求头数据源标记的变量*/
     private String header = "";
-    /** 是否启动时候检查所有数据源有效性,默认false,不检查*/
-    private Boolean check = false;
+    /** 是否启动时候检查所有数据源有效性,默认true,检查*/
+    private Boolean check = true;
 
     /** 是否严格匹配数据源,匹配不到报错, 默认true */
     private Boolean strict = true;
