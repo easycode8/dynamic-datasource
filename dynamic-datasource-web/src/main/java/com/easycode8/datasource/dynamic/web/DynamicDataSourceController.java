@@ -23,21 +23,6 @@ public class DynamicDataSourceController {
     @Autowired
     private DynamicDataSourceManager dynamicDataSourceManager;
 
-    @GetMapping ("/dynamic-datasource.html")
-    public String index(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
-
-        String apiPrefix = "/";
-        model.addAttribute("apiUrl", apiPrefix);
-        Map<String, Object> front = new HashMap<>();
-
-        front.put("iview_css", apiPrefix + "webjars/dynamic-datasource-ui/iview/style/iview.css");
-        front.put("iview_js", apiPrefix + "webjars/dynamic-datasource-ui/iview/iview.min.js");
-        front.put("vue_js", apiPrefix + "webjars/dynamic-datasource-ui/vue/vue.js");
-        front.put("axios_js", apiPrefix + "webjars/dynamic-datasource-ui/axios/axios.min.js");
-        model.addAttribute("front", front);
-        return "dynamic-datasource";
-    }
-
     @GetMapping("/dynamic-datasource-ui/list")
     public ResponseEntity<Map<String, Object>> list() {
         Map<String, Object> result = new HashMap<>();

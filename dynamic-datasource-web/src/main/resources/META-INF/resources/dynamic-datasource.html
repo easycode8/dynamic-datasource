@@ -2,26 +2,28 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>动态数据源</title>
+    <title>动态数据源管理</title>
 
-    <script type="text/javascript" th:src="${front.vue_js}"></script>
-    <script type="text/javascript" th:src="${front.axios_js}"></script>
-    <link th:href="${front.iview_css}" rel="stylesheet"/>
-    <script type="text/javascript" th:src="${front.iview_js}"></script>
+    <script type="text/javascript" th:src="${front.vue_js}" src="webjars/dynamic-datasource-ui/vue/vue.js"></script>
+    <script type="text/javascript" th:src="${front.axios_js}" src="webjars/dynamic-datasource-ui/axios/axios.min.js"></script>
+    <link th:href="${front.iview_css}" rel="stylesheet" href="webjars/dynamic-datasource-ui/iview/style/iview.css"/>
+    <script type="text/javascript" th:src="${front.iview_js}" src="webjars/dynamic-datasource-ui/iview/iview.min.js"></script>
 </head>
 <body>
+<div id="app-user"></div>
 
-<div id="app-dynamic">
 
-    <Divider orientation="left">动态数据源管理</Divider>
+<div id="app-log">
+
+
     <i-Form ref="formSearchUser" :model="datasource" :label-width="60" inline>
 
         <Form-Item label="key" prop="key">
-            <i-Input type="text" v-model="datasource.key" placeholder="数据源key">
+            <i-Input type="text" v-model="datasource.key" placeholder="数据源key" >
             </i-Input>
         </Form-Item>
         <Form-Item label="url" prop="url">
-            <i-Input type="text" v-model="datasource.url" placeholder="jdbc连接">
+            <i-Input type="text" v-model="datasource.url" placeholder="jdbc连接" style="width: 600px" >
             </i-Input>
         </Form-Item>
         <Form-Item label="username" prop="username">
@@ -40,7 +42,6 @@
     </i-Form>
 
 
-    <!--log 列表 -->
     <i-table size="small" :columns="log.columns" :data="log.data" @on-selection-change="onSelectionChange"></i-table>
 
 
@@ -50,12 +51,22 @@
 <!-- 在js中使用模板变量 带有模板的入口页面 -->
 <script type="text/javascript" th:inline="javascript">
 
-    var apiUrl = [[${apiUrl}]];
-
-    console.log(apiUrl);
-
     //全局变量
-    Vue.prototype.baseUrl = apiUrl;
+    Vue.prototype.baseUrl = "/";
+
+
+    var springfox = {
+        "getBaseUrl": function() {
+            var baseUrl;
+            if (baseUrl === undefined) {
+                var urlMatches = /(.*)\/dynamic-datasource.html.*/.exec(window.location.href);
+                baseUrl = urlMatches[1];
+            }
+            return baseUrl;
+        }
+    };
+    console.log(springfox.getBaseUrl())
+    Vue.prototype.baseUrl = springfox.getBaseUrl()
 
     Date.prototype.Format = function (fmt) { //
         let o = {
@@ -89,10 +100,10 @@
     }, function (error) {
         // 对响应错误做点什么
         if (error.status == 403) {
-            dynamicVM.log.form.isAddModalShow = true;
+            logVM.log.form.isAddModalShow = true;
             window.globalConfig.user = "";
             // 补充requestId提示
-            dynamicVM.$Modal.warning({
+            logVM.$Modal.warning({
                 title: '提示403',
                 content: error.data.msg + "<br> requestId:" + error.headers.requestid
             });
@@ -115,16 +126,19 @@
 
     Vue.prototype.axios = instance;
 
-    var dynamicVM = new Vue({
-        el: '#app-dynamic',
+    var logVM = new Vue({
+        el: '#app-log',
         data: {
             //user:window.globalConfig.user,
             datasource: {
-                key: "test",
-                //url: "jdbc:h2:mem:test",
+                key: "db_xxx",
                 url: "jdbc:mysql://192.168.4.187:3306/test?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true",
-                username: 'abc',
-                password: 'adb'
+                username: '',
+                password: ''
+            },
+            formInline: {
+                username: '',
+                password: ''
             },
 
             log: {
@@ -150,7 +164,7 @@
 
                         render: (h, params) => {
                             return h('div', [
-            /*                    h('Button', {
+/*                                h('Button', {
                                     props: {type: 'primary', size: 'small'},
                                     style: {marginRight: '5px'},
                                     on: {
@@ -174,7 +188,7 @@
                                     },
                                     on: {
                                         click: () => {
-                                            dynamicVM.logRemove(params.index)
+                                            logVM.logRemove(params.index)
                                         }
                                     }
                                 }, '移除')
@@ -183,13 +197,44 @@
                     }],
                 // 被选中行
                 selectedItem: [],
-
+                // 查询表单模型
+                formSearch: {
+                    model: {
+                        logId: '',
+                        type: '',
+                        title: '',
+                        description: '',
+                    }
+                },
+                // 添加/修改表单模型
+                form: {
+                    isEditModalShow: false,
+                    isAddModalShow: false,
+                    model: {
+                        logId: '',
+                        type: '',
+                        title: '',
+                        description: '',
+                        ip: '',
+                        requestUri: '',
+                        method: '',
+                        params: '',
+                        exception: '',
+                        operateDate: '',
+                        timeout: '',
+                        loginName: '',
+                        requestId: '',
+                        dataSnapshot: '',
+                        requestTimestamp: '',
+                        status: ''
+                    }
+                }
             }
 
         },
         created: function () {
 
-            this.loadDatasource(this.log.pageNum, this.log.pageSize);
+            this.loadLogs(this.log.pageNum, this.log.pageSize);
 
         }
         ,
@@ -203,11 +248,11 @@
             ,
             // 提交查询
             handleSearchSubmit() {
-                this.loadDatasource(0, this.log.pageSize);
+                this.loadLogs(0, this.log.pageSize);
             }
             ,
             //分页加载数据
-            loadDatasource: function (pageNum, pageSize) {
+            loadLogs: function (pageNum, pageSize) {
                 var vm = this;
 
                 this.axios.get('dynamic-datasource-ui/list', {
@@ -221,14 +266,14 @@
             //页码变更
             logChangePage: function (val) {
                 this.log.pageNum = val;
-                this.loadDatasource(this.log.pageNum, this.log.pageSize);
+                this.loadLogs(this.log.pageNum, this.log.pageSize);
                 console.log(val);
             }
             ,
             //页大小变更
             logChangePageSize: function (val) {
                 this.log.pageSize = val;
-                this.loadDatasource(this.log.pageNum, this.log.pageSize);
+                this.loadLogs(this.log.pageNum, this.log.pageSize);
                 console.log(val);
             }
             ,
@@ -267,7 +312,7 @@
                         vm.$Message.success(result.message);
                     } else {
                         vm.$Message.warning(result.message);
-                        vm.loadDatasource(vm.log.pageNum, vm.log.pageSize);
+                        vm.loadLogs(vm.log.pageNum, vm.log.pageSize);
                     }
 
                 })
@@ -297,7 +342,7 @@
                             content: response.data.msg
                         });
                     }
-                    vm.loadDatasource(vm.log.pageNum, vm.log.pageSize);
+                    vm.loadLogs(vm.log.pageNum, vm.log.pageSize);
                 })
             }
             ,
@@ -321,7 +366,7 @@
                             content: response.data.msg
                         });
                     }
-                    vm.loadDatasource(vm.log.pageNum, vm.log.pageSize);
+                    vm.loadLogs(vm.log.pageNum, vm.log.pageSize);
                 })
             }
             ,
@@ -354,7 +399,7 @@
                             content: response.data.message
                         });
                     }
-                    vm.loadDatasource(vm.log.pageNum, vm.log.pageSize);
+                    vm.loadLogs(vm.log.pageNum, vm.log.pageSize);
                 }).catch(function (error) {
 
                 })
