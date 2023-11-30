@@ -37,7 +37,7 @@ public class DynamicDataSourceAspect {
     @Before("@annotation(dynamicSource)")
     public void changeDataSource(JoinPoint point, DynamicSource dynamicSource) throws Throwable {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            LOGGER.warn("已经开启spring事务,事务内切换数据源失效");
+            LOGGER.warn("[dynamic-datasource] 已经开启spring事务,事务内切换数据源失效");
             return;
         }
         String headerKey = dataSourceProperties.getHeader();
@@ -48,7 +48,7 @@ public class DynamicDataSourceAspect {
             ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             request = requestAttributes.getRequest();
         } catch (Exception e) {
-            LOGGER.warn("get http error:" + e.getMessage());
+            LOGGER.warn("[dynamic-datasource] get http error:" + e.getMessage());
         }
 
         String dataBaseType = this.parseDataSourceType(point, dynamicSource);
@@ -57,29 +57,29 @@ public class DynamicDataSourceAspect {
             if (StringUtils.equals(dataBaseType, dynamicSource.value()) && !dataSourceProperties.getDatasource().keySet().contains(dataBaseType)) {
                 throw new IllegalStateException(MessageFormat.format("注解数据源未定义:{0},调整或增加配置:{1}.{0}", dataBaseType, "spring.datasource.dynamic.datasource"));
             }
-            LOGGER.debug("动态数据源栈--入栈切换:【{}】注解方式", dataBaseType);
+            LOGGER.debug("[dynamic-datasource] 动态数据源栈--入栈切换:【{}】注解方式", dataBaseType);
         } else if (request != null && StringUtils.isNotBlank(request.getHeader(headerKey))) {
             dataBaseType = request.getHeader(headerKey);
-            LOGGER.debug("动态数据源--入栈切换:【{}】请求头方式", headerKey, dataBaseType);
+            LOGGER.debug("[dynamic-datasource] 动态数据源--入栈切换:【{}】请求头方式", headerKey, dataBaseType);
         }  else {
             // 注解中未定义数据源,则使用首选数据源
             dataBaseType = dataSourceProperties.getPrimary();
-            LOGGER.debug("动态数据源--入栈切换:【{}】默认首选", dataBaseType);
+            LOGGER.debug("[dynamic-datasource] 动态数据源--入栈切换:【{}】默认首选", dataBaseType);
         }
 
         DynamicDataSourceHolder.push(dataBaseType);
-        LOGGER.debug("数据源栈:{}", DynamicDataSourceHolder.show());
+        LOGGER.debug("[dynamic-datasource] 数据源栈:{}", DynamicDataSourceHolder.show());
     }
 
     @After("@annotation(dynamicSource)")
     public void restoreDataSource(JoinPoint point, DynamicSource dynamicSource) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            LOGGER.debug("已经开启spring事务切换数据源失效");
+            LOGGER.debug("[dynamic-datasource] 已经开启spring事务切换数据源失效");
             return;
         }
         //清除数据源的配置
-        LOGGER.trace("数据源栈:{}", DynamicDataSourceHolder.show());
-        LOGGER.debug("动态数据源栈--出栈解绑:{}", DynamicDataSourceHolder.peek());
+        LOGGER.trace("[dynamic-datasource] 数据源栈:{}", DynamicDataSourceHolder.show());
+        LOGGER.debug("[dynamic-datasource] 动态数据源栈--出栈解绑:{}", DynamicDataSourceHolder.peek());
         DynamicDataSourceHolder.poll();
 
     }

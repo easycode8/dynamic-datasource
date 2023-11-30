@@ -15,13 +15,6 @@
         动态数据源springboot自动装配项目
     </description>
 
-    <properties>
-
-
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>io.github.easycode8</groupId>

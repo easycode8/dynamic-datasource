@@ -23,6 +23,8 @@ import org.springframework.util.ClassUtils;
 @Order(0)//动态数据源事务要在切换数据源前面执行
 public class DynamicTransactionAspect {
 
+
+
     private AbstractDataSourceTransactionManager transactionManager;
 
     public DynamicTransactionAspect(AbstractDataSourceTransactionManager transactionManager) {
@@ -43,7 +45,7 @@ public class DynamicTransactionAspect {
         Class<?> targetClass = (joinPoint.getTarget() != null ? AopUtils.getTargetClass(joinPoint.getTarget()) : null);
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         String methodIdentification = ClassUtils.getQualifiedMethodName(signature.getMethod(), targetClass);
-        System.out.println("=====动态数据源事务切面--开始======" + methodIdentification);
+//        System.out.println("=====动态数据源事务切面--开始======" + methodIdentification);
         Assert.isTrue(!TransactionSynchronizationManager.isSynchronizationActive(), methodIdentification + "包含在spring事务中,不可使用动态数据源事务");
         TransactionInfo txInfo = transactionManager.createTransaction(methodIdentification);
 
@@ -60,7 +62,7 @@ public class DynamicTransactionAspect {
         }
         // 执行成功--提交事务
         transactionManager.commitTransactionAfterReturning(txInfo);
-        System.out.println("=====动态数据源事务切面--结束======" + txInfo.getName());
+//        System.out.println("=====动态数据源事务切面--结束======" + txInfo.getName());
         return result;
     }
 }
