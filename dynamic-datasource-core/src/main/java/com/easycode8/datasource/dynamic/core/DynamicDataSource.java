@@ -4,6 +4,8 @@ import com.easycode8.datasource.dynamic.core.exception.DynamicDataSourceNotFound
 import com.easycode8.datasource.dynamic.core.provider.DataSourceProvider;
 import com.easycode8.datasource.dynamic.core.transaction.ConnectionHolder;
 import com.easycode8.datasource.dynamic.core.transaction.TransactionSynchronizationManager;
+import com.easycode8.datasource.dynamic.core.util.JdbcUrlParserUtils;
+import com.easycode8.datasource.dynamic.core.util.SpringReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -72,7 +74,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Disp
             if (!TransactionSynchronizationManager.isActualTransactionActive()) {
                 connection = super.getConnection();
                 connection = dynamicConnectionProxyFactory.createProxy(connection, lookupKey);
-                LOGGER.info("Acquired {} for Dynamic JDBC no transaction", connection);
+                LOGGER.info("[dynamic-datasource] Acquired {} for Dynamic JDBC no transaction", connection);
                 return connection;
             }
             // 根据动态数据源获取当前线程中活跃的连接状态
@@ -86,7 +88,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Disp
             // 获取当前数据源的连接设置手动提交
             connection = dynamicConnectionProxyFactory.createProxy(connection, lookupKey);
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Acquired ConnectionProxy [" + connection + "] for Dynamic JDBC transaction");
+                LOGGER.debug("[dynamic-datasource] Acquired ConnectionProxy [" + connection + "] for Dynamic JDBC transaction");
             }
             connection.setAutoCommit(false);
             connectionHolder.putConnection(lookupKey, connection);
@@ -109,17 +111,17 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Disp
 
     @Override
     public void destroy() throws Exception {
-        LOGGER.info("dynamic datasource start closing ....");
+        LOGGER.info("[dynamic-datasource] dynamic datasource start closing ....");
         for (Map.Entry<String, DataSource> item : dynamicDataSourceMap.entrySet()) {
             this.closeDataSource(item.getKey(), item.getValue());
         }
-        LOGGER.info("dynamic datasource all closed success");
+        LOGGER.info("[dynamic-datasource] dynamic datasource all closed success");
     }
 
 
     protected synchronized void add(String dataSourceKey, DataSource dataSource) {
         if (dynamicDataSourceMap.containsKey(dataSourceKey)) {
-            throw new IllegalStateException("dynamic datasource already exist key:" + dataSourceKey);
+            throw new IllegalStateException("[dynamic-datasource] dynamic datasource already exist key:" + dataSourceKey);
         }
         dynamicDataSourceMap.put(dataSourceKey, dataSource);
     }
@@ -127,7 +129,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Disp
 
     protected synchronized void remove(String key) {
         if (dynamicDataSourceProperties.getPrimary().equals(key)) {
-            throw new IllegalStateException("primary dynamic datasource cannot remove " + key);
+            throw new IllegalStateException("[dynamic-datasource] primary dynamic datasource cannot remove " + key);
         }
         DataSource dataSource = this.dynamicDataSourceMap.remove(key);
         if (dataSource != null) {
@@ -136,18 +138,27 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Disp
     }
 
 
-    public ConcurrentHashMap<String, DataSource> getDynamicDataSourceMap() {
+    protected ConcurrentHashMap<String, DataSource> getDynamicDataSourceMap() {
         return dynamicDataSourceMap;
     }
 
+    /**
+     * 获取当前动态数据源的数据库类型
+     * @return
+     */
+    public String getCurrentDatabaseType() {
+        String jdbcUrl = (String) SpringReflectionUtils.invokeMethod(determineTargetDataSource(), determineTargetDataSource().getClass(), "getJdbcUrl", "getUrl");
+        return JdbcUrlParserUtils.extractDatabaseType(jdbcUrl);
+    }
+
     private void closeDataSource(String dsName, DataSource dataSource) {
-        LOGGER.info("close dynamic datasource :{}", dsName);
+        LOGGER.info("[dynamic-datasource] close dynamic datasource :{}", dsName);
         Method closeMethod = ReflectionUtils.findMethod(dataSource.getClass(), "close");
         if (closeMethod != null) {
             try {
                 closeMethod.invoke(dataSource);
             } catch (Exception e) {
-                LOGGER.error("close dynamic datasource:{}", dsName, e);
+                LOGGER.error("[dynamic-datasource] close dynamic datasource:{}", dsName, e);
             }
         }
     }
@@ -156,11 +167,11 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Disp
     private void chooseDefaultDataSource() {
         DataSource primaryDataSource = dynamicDataSourceMap.get(dynamicDataSourceProperties.getPrimary());
         if (primaryDataSource == null) {
-            throw new IllegalStateException("【easy-model】未找到首选数据源:" + dynamicDataSourceProperties.getPrimary());
+            throw new IllegalStateException("[dynamic-datasource] 未找到首选数据源:" + dynamicDataSourceProperties.getPrimary());
         }
         this.setDefaultTargetDataSource(primaryDataSource);
-        LOGGER.info("【easy-model】动态数据源--主源:{}", dynamicDataSourceProperties.getPrimary());
-        LOGGER.info("【easy-model】动态数据源--切换请求头:{}", dynamicDataSourceProperties.getHeader());
+        LOGGER.info("[dynamic-datasource] 动态数据源--主源:{}", dynamicDataSourceProperties.getPrimary());
+        LOGGER.info("[dynamic-datasource] 动态数据源--切换请求头:{}", dynamicDataSourceProperties.getHeader());
     }
 
     private void loadAllDataSource() {
@@ -169,15 +180,15 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Disp
             dynamicDataSourceMap.putAll(provider.loadDataSources());
         }
         if (CollectionUtils.isEmpty(dynamicDataSourceMap)) {
-            LOGGER.warn("【easy-model】未读取到动态数据源,使用spring原生数据源作为首选数据源");
+            LOGGER.warn("[dynamic-datasource] 未读取到动态数据源,使用spring原生数据源作为首选数据源");
             dynamicDataSourceMap.put(dynamicDataSourceProperties.getPrimary(), dataSourceProperties.initializeDataSourceBuilder().build());
         } else {
             if (!dynamicDataSourceMap.containsKey(dynamicDataSourceProperties.getPrimary())) {
-                LOGGER.warn("【easy-model】未设置动态数据源主源,使用spring原生数据源作为首选数据源");
+                LOGGER.warn("[dynamic-datasource] 未设置动态数据源主源,使用spring原生数据源作为首选数据源");
                 dynamicDataSourceMap.put(dynamicDataSourceProperties.getPrimary(), dataSourceProperties.initializeDataSourceBuilder().build());
             }
         }
-        LOGGER.info("【easy-model】动态数据源--加载成功:{}", String.join(",", dynamicDataSourceMap.keySet()));
+        LOGGER.info("[dynamic-datasource] 动态数据源--加载成功:{}", String.join(",", dynamicDataSourceMap.keySet()));
     }
 
 
